@@ -1,0 +1,159 @@
+var axios = require('axios');
+
+let on_values = [];
+let off_values = [];
+
+const low = -10.0;
+const high = -5.0;
+let count = 0;
+let result = NaN;
+
+do {
+	console.log(count++);
+
+	on_values = [];
+	off_value = [];
+
+	for(let i = 0; i < 120; i++) {
+		on_values.push(Math.floor(Math.random() * 100));
+		off_values.push(Math.floor(Math.random() * 100));
+	}
+
+	const on_mean = calculateMean(on_values);
+	const off_mean = calculateMean(off_values);
+
+	result = (on_mean * 100 / off_mean) - 100;
+} while(result > high || result < low);
+
+console.log(calculateMean(on_values));
+console.log(calculateMean(off_values));
+
+let splitStream = [];
+
+for(let i = 0; i < on_values.length; i++) {
+	var uuid = uuidv4();
+	const data = [
+	  {
+	    f: "basic",
+	    i: [
+	      {
+	        k: uuid,
+	        t: Math.random() > 0.5 ? "on" : "off",
+	        m: 1,
+			c: 1676998262981,
+	        r: "default rule"
+	      }
+	    ]
+	  }
+	];
+
+	const event = {
+		key: uuid,
+		eventTypeId: 'dbm_error',
+		value: on_values[i],
+		timestamp: new Date().getTime(),
+		properties: { device: "atari" },
+		trafficTypeName: "user",
+	}
+
+	let entry = {data: data, event: event};
+
+	splitStream.push(entry);
+}
+
+sendImpressions(splitStream);
+sendEvents(splitStream);
+
+function sendImpressions(splitStream) {
+	let itr = 0;	
+	for(const entry of splitStream) {
+		let data = entry.data;
+
+		let interval = 1000 * 60 * 60 * 24 * 1;
+		const delta = 1000 * 60 * 60 * 1;
+
+		const ts = new Date().getTime() - interval - (delta * itr++);
+		// console.log(JSON.stringify(data, 0, 2));
+		data[0].i[0].m = ts; 
+		console.log(new Date(ts));
+
+		var config = {
+		  method: 'post',
+		  url: 'https://events.split.io/api/testImpressions/bulk',
+		  headers: { 
+		    'Authorization': 'Bearer 70jiipvg64kkvds3ar48sf0ugrptgvpqts8d', 
+		    'Content-Type': 'application/json'
+		  },
+		  data: data 
+		};
+		// console.log(config);
+		axios(config)
+		.then(function (response) {
+			console.log('o');
+			// console.log(JSON.stringify(response.data));
+		})
+		.catch(function (error) {
+		  console.log(error);
+		  return;
+		});
+	}
+}
+
+function sendEvents(splitStream) {
+	let itr = 0;
+
+	for(const entry of splitStream) {
+		let event = entry.event;
+
+		let interval = 1000 * 60 * 60 * 24 * 1;
+		const delta = 1000 * 60 * 60 * 1;
+
+		const ts = new Date().getTime() - interval - (delta * itr++);	
+		event.timestamp = ts;
+		console.log(new Date(ts));
+
+		var eventConfig = {
+		  method: 'post',
+		  url: 'https://events.split.io/api/events',
+		  headers: { 
+		    'Authorization': 'Bearer 70jiipvg64kkvds3ar48sf0ugrptgvpqts8d', 
+		    'Content-Type': 'application/json'
+		  },
+		  data : event
+		};		
+
+		// console.log(eventConfig);
+		axios(eventConfig)
+		.then(function (response) {
+		  // console.log(JSON.stringify(response.data));
+			console.log('+');
+		})
+		.catch(function(error) {
+		  console.log(error);
+		  return;
+		});		
+
+		setTimeout(() => {}, 500);
+	}
+}
+
+function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
+function calculateMean(list) {
+	// console.log('calculateMean(list)' + list);
+	let count = 0;
+	let sum = 0;
+	for(const value of list) {
+		sum += value;
+		count++;
+	}
+
+	const result = sum / count;
+	// console.log('calculateMean result: ' + result);
+	return result;
+}
