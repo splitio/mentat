@@ -1,4 +1,5 @@
 var axios = require('axios');
+const fs = require('fs');
 
 let on_values = [];
 let off_values = [];
@@ -11,6 +12,8 @@ let count = 0;
 let result = NaN;
 let splitStream = [];
 let changeNumber;
+
+const splitServerApiKey = fs.readFileSync('SPLIT_CLIENT_API_KEY', 'utf8').trim();
 
 createImpressionsAndEvents();
 
@@ -88,7 +91,7 @@ async function getChangeNumber(splitName) {
 	  method: 'get',
 	  url: ' https://sdk.split.io/api/splitChanges?since=-1',
 	  headers: { 
-	    'Authorization': 'Bearer 70jiipvg64kkvds3ar48sf0ugrptgvpqts8d', 
+	    'Authorization': 'Bearer ' + splitServerApiKey,
 	    'Content-Type': 'application/json'
 	  }
 	};		
@@ -126,7 +129,7 @@ function sendImpressions(splitStream) {
 		  method: 'post',
 		  url: 'https://events.split.io/api/testImpressions/bulk',
 		  headers: { 
-		    'Authorization': 'Bearer 70jiipvg64kkvds3ar48sf0ugrptgvpqts8d', 
+		    'Authorization': 'Bearer ' + splitServerApiKey, 
 		    'Content-Type': 'application/json'
 		  },
 		  data: data 
@@ -161,7 +164,7 @@ function sendEvents(splitStream) {
 		  method: 'post',
 		  url: 'https://events.split.io/api/events',
 		  headers: { 
-		    'Authorization': 'Bearer 70jiipvg64kkvds3ar48sf0ugrptgvpqts8d', 
+		    'Authorization': 'Bearer ' + splitServerApiKey, 
 		    'Content-Type': 'application/json'
 		  },
 		  data : event
