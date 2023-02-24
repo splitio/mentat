@@ -13,7 +13,7 @@ let result = NaN;
 let splitStream = [];
 let changeNumber;
 
-const splitServerApiKey = fs.readFileSync('SPLIT_CLIENT_API_KEY', 'utf8').trim();
+const splitServerApiKey = fs.readFileSync('SPLIT_SERVER_API_KEY', 'utf8').trim();
 
 createImpressionsAndEvents();
 
