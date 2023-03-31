@@ -45,7 +45,7 @@ if(config.impact) {
 
 answer = readlineSync.question('desired impact -50 to +50 [' + impact + ']? ');
 if(answer !== '') {
-	answer = parseInt(answer, 10);
+	impact = Number(answer);
 }
 
 let eventTypeId;
