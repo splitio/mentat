@@ -1,5 +1,12 @@
 # MENTAT - backdated impressions and events
 
+Clone the repository and 'npm install' to bring in dependencies.  
+
+```
+npm install
+node index.js
+```
+
 Mentat is a script designed to create a series of impressions and events, assign them random values, and timestamp them to have begun a week in the past.
 
 By "backdating" the impressions and events, a Split user can generate charts now, while still making it appear as if the data was collected over time.
