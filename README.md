@@ -13,7 +13,7 @@ By "backdating" the impressions and events, a Split user can generate charts now
 
 In order for the approach to work currently...
 
- - You must enter the version number of your target split.  The split must define a 50/50 default rule.  For best results, the version of the split should be at least three days old.   
+ - You must enter the split name of your target split.  This split must define a 50/50 default rule.  For best results, the current version of the split should be at least three days old.   
 
  - You must enter your server-sider SDK API key
 
